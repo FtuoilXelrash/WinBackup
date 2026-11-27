@@ -8,6 +8,12 @@
     <SolidColorBrush x:Key="AppBorderBrush" Color="#DCDCDC"/>
     <SolidColorBrush x:Key="AppInputBrush" Color="#FFFFFF"/>
 
+    <SolidColorBrush x:Key="ActionCopyToDestinationBrush" Color="#D9F2D6"/>
+    <SolidColorBrush x:Key="ActionCopyToSourceBrush" Color="#D6E8FB"/>
+    <SolidColorBrush x:Key="ActionDeleteDestinationBrush" Color="#FAD4D4"/>
+    <SolidColorBrush x:Key="ActionDeleteSourceBrush" Color="#F2D9F2"/>
+    <SolidColorBrush x:Key="ActionSkipBrush" Color="#FFEDB8"/>
+
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#C5DCFF"/>
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#1A1A1A"/>
     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#E2EDFF"/>
