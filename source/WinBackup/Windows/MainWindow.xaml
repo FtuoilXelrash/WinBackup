@@ -23,8 +23,8 @@
                 <MenuItem Header="_Delete" Click="Delete_Click" InputGestureText="Del"/>
             </MenuItem>
             <MenuItem x:Name="RunMenu" Header="_Run">
-                <MenuItem Header="Pre_view..." Click="Preview_Click"/>
-                <MenuItem Header="_Start Selected" Click="Run_Click" InputGestureText="F5"/>
+                <MenuItem x:Name="PreviewMenuItem" Header="Pre_view..." Click="Preview_Click"/>
+                <MenuItem x:Name="StartMenuItem" Header="_Start Selected" Click="Run_Click" InputGestureText="F5"/>
                 <MenuItem Header="Start _All Enabled" Click="RunAll_Click"/>
                 <Separator/>
                 <MenuItem Header="_Pause / Resume" Click="Pause_Click"/>
@@ -55,8 +55,8 @@
         <WrapPanel x:Name="ToolPanel" DockPanel.Dock="Top" Margin="6,4">
             <Button Content="New Profile" Padding="10,3" Margin="0,0,6,0" Click="NewProfile_Click"/>
             <Button Content="Edit" Padding="10,3" Margin="0,0,16,0" Click="Edit_Click"/>
-            <Button Content="Preview" Padding="10,3" Margin="0,0,6,0" Click="Preview_Click"/>
-            <Button Content="Start" Padding="10,3" Margin="0,0,6,0" Click="Run_Click"/>
+            <Button x:Name="PreviewButton" Content="Preview" Padding="10,3" Margin="0,0,6,0" Click="Preview_Click"/>
+            <Button x:Name="StartButton" Content="Start" Padding="10,3" Margin="0,0,6,0" Click="Run_Click"/>
             <Button Content="Start All" Padding="10,3" Margin="0,0,6,0" Click="RunAll_Click"/>
         </WrapPanel>
 
@@ -98,7 +98,7 @@
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type vm:ProfileNode}" ItemsSource="{Binding Children}">
                         <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Margin="0,0,5,0">
+                            <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Margin="0,0,5,0" Click="ProfileCheck_Click">
                                 <CheckBox.Style>
                                     <Style TargetType="CheckBox">
                                         <Style.Triggers>
@@ -125,8 +125,8 @@
                 </TreeView.ItemTemplate>
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Preview..." Click="Preview_Click"/>
-                        <MenuItem Header="Start" Click="Run_Click"/>
+                        <MenuItem x:Name="PreviewContextItem" Header="Preview..." Click="Preview_Click"/>
+                        <MenuItem x:Name="StartContextItem" Header="Start" Click="Run_Click"/>
                         <Separator/>
                         <MenuItem Header="Edit..." Click="Edit_Click"/>
                         <MenuItem Header="Copy" Click="Copy_Click"/>
