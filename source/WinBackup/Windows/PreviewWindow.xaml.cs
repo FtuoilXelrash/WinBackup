@@ -11,7 +11,7 @@ namespace WinBackup.Windows;
 
 public partial class PreviewWindow : Window
 {
-    private readonly Profile _profile;
+    private Profile _profile;
     private RunControl? _control;
     private JobPlan? _plan;
 
@@ -20,13 +20,33 @@ public partial class PreviewWindow : Window
         InitializeComponent();
         WindowPlacement.Track(this, "Preview");
         _profile = JsonStore.Clone(profile);
-        Title = $"WinBackup — Preview — {_profile.Name}";
         Loaded += (_, _) => Build();
         Closed += (_, _) => _control?.Cancel();
     }
 
+    private bool LoadProfile()
+    {
+        var saved = App.Instance.Profiles.Find(_profile.Id);
+        if (saved != null)
+        {
+            _profile = JsonStore.Clone(saved);
+            Title = $"WinBackup — Preview — {_profile.Name}";
+            return true;
+        }
+
+        _plan = null;
+        ItemGrid.ItemsSource = null;
+        WarningBox.Visibility = Visibility.Collapsed;
+        BusyPanel.Visibility = Visibility.Collapsed;
+        RunButton.IsEnabled = false;
+        SummaryText.Text = "This profile no longer exists.";
+        TotalsText.Visibility = Visibility.Collapsed;
+        return false;
+    }
+
     private async void Build()
     {
+        if (!LoadProfile()) return;
         var control = _control = new RunControl();
         _plan = null;
         ItemGrid.ItemsSource = null;
@@ -34,6 +54,7 @@ public partial class PreviewWindow : Window
         WarningBox.Visibility = Visibility.Collapsed;
         RunButton.IsEnabled = RefreshButton.IsEnabled = false;
         SummaryText.Text = "";
+        TotalsText.Visibility = Visibility.Collapsed;
 
         var throttle = Stopwatch.StartNew();
         try
@@ -82,7 +103,48 @@ public partial class PreviewWindow : Window
 
         RunButton.IsEnabled = plan.Failures.Count == 0 && items.Count > 0;
         UpdateSummary();
+        ShowTotals(plan);
     }
+
+    private void ShowTotals(JobPlan plan)
+    {
+        TotalsText.Visibility = plan.Pairs.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        var sources = Describe(plan.Pairs
+            .Where(p => p.SourceTotals != null)
+            .DistinctBy(p => p.SourceRoot, StringComparer.OrdinalIgnoreCase)
+            .Select(p => p.SourceTotals!));
+        var destinations = plan.Profile.Mode == CopyMode.Backup
+            ? "not compared in Backup mode"
+            : Describe(plan.Pairs
+                .Where(p => p.DestinationTotals != null)
+                .DistinctBy(p => p.DestinationRoot, StringComparer.OrdinalIgnoreCase)
+                .Select(p => p.DestinationTotals!));
+        var failed = plan.Pairs.Count(p => p.SourceTotals == null);
+
+        TotalsText.Text = $"Source: {sources}\nDestination: {destinations}\nTime taken: {Duration(plan.Elapsed)}" +
+                          (failed > 0 ? $"    NOT COMPARED: {failed} folder pair(s), see the warnings below" : "");
+    }
+
+    private static string Describe(IEnumerable<ScanTotals> totals)
+    {
+        var list = totals.ToList();
+        return $"{list.Sum(t => (long)t.Files):N0} files, {list.Sum(t => (long)t.Folders):N0} folders, " +
+               $"{Size(list.Sum(t => t.Bytes))}    Skipped by filters: {list.Sum(t => (long)t.SkippedFiles):N0} files, " +
+               $"{list.Sum(t => (long)t.SkippedFolders):N0} folders";
+    }
+
+    private static string Size(long bytes) => bytes switch
+    {
+        >= 1L << 40 => $"{bytes / (double)(1L << 40):N2} TB",
+        >= 1L << 30 => $"{bytes / (double)(1L << 30):N2} GB",
+        >= 1L << 20 => $"{bytes / (double)(1L << 20):N1} MB",
+        _ => $"{bytes / 1024.0:N0} KB"
+    };
+
+    private static string Duration(TimeSpan time) => time.TotalMinutes >= 1
+        ? $"{(int)time.TotalMinutes} min {time.Seconds} sec"
+        : $"{time.TotalSeconds:N1} sec";
 
     private void UpdateSummary()
     {
