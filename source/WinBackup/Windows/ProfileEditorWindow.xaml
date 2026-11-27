@@ -1,0 +1,270 @@
+<Window x:Class="WinBackup.Windows.ProfileEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="clr-namespace:WinBackup.Models"
+        Title="WinBackup — Profile" Width="720" Height="560" MinWidth="600" MinHeight="460"
+        Icon="/WinBackup.ico" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppWindowBrush}"
+        TextElement.Foreground="{DynamicResource AppTextBrush}">
+    <DockPanel Margin="10">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Save" Width="80" IsDefault="True" Click="Save_Click"/>
+            <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" Click="Cancel_Click"/>
+        </StackPanel>
+
+        <TabControl x:Name="Tabs">
+            <TabItem Header="General">
+                <StackPanel Margin="16,12">
+                    <TextBlock Text="Profile name" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding Name}" Padding="3"/>
+                    <TextBlock Text="Profile list folder (leave empty for the top level)" Margin="0,12,0,4"/>
+                    <ComboBox x:Name="FolderCombo" IsEditable="False" SelectedItem="{Binding Folder}"/>
+                    <CheckBox x:Name="EnabledCheck" Content="Enabled (included in Run All and the scheduler)" IsChecked="{Binding Enabled}" Margin="0,12,0,0"/>
+                    <TextBlock Text="Copy mode" Margin="0,16,0,4"/>
+                    <ComboBox x:Name="ModeCombo" SelectedValuePath="Tag" SelectedValue="{Binding Mode}">
+                        <ComboBoxItem Content="Mirror — make the destination an exact copy of the source" Tag="{x:Static m:CopyMode.Mirror}"/>
+                        <ComboBoxItem Content="Update — copy new and newer files, delete nothing" Tag="{x:Static m:CopyMode.Update}"/>
+                        <ComboBoxItem Content="Backup — copy everything to a dated folder or ZIP file" Tag="{x:Static m:CopyMode.Backup}"/>
+                        <ComboBoxItem Content="Sync — bring both sides up to date" Tag="{x:Static m:CopyMode.Sync}"/>
+                    </ComboBox>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Folders">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+                            <TextBlock Text="Source folders" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Add..." Tag="Source" Click="AddFolder_Click" Padding="8,2"/>
+                                <Button Content="Add Text" Tag="Source" Click="AddText_Click" Padding="8,2" Margin="4,0,0,0"/>
+                                <Button Content="Browse..." Tag="Source" Click="Browse_Click" Padding="8,2" Margin="4,0,0,0"/>
+                                <Button Content="Remove" Tag="Source" Click="Remove_Click" Padding="8,2" Margin="4,0,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
+                        <DataGrid x:Name="SourceGrid" ItemsSource="{Binding Sources}" AutoGenerateColumns="False"
+                                  CanUserAddRows="False" HeadersVisibility="Column" SelectionMode="Single"
+                                  AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Use" Width="40">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Folder" Binding="{Binding Path}" Width="*"/>
+                                <DataGridTextColumn Header="Subfolder name" Binding="{Binding Subfolder}" Width="140"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+
+                    <DockPanel Grid.Row="1" Margin="0,10,0,0">
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+                            <TextBlock Text="Destination folders" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Add..." Tag="Destination" Click="AddFolder_Click" Padding="8,2"/>
+                                <Button Content="Add Text" Tag="Destination" Click="AddText_Click" Padding="8,2" Margin="4,0,0,0"/>
+                                <Button Content="Browse..." Tag="Destination" Click="Browse_Click" Padding="8,2" Margin="4,0,0,0"/>
+                                <Button Content="Remove" Tag="Destination" Click="Remove_Click" Padding="8,2" Margin="4,0,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
+                        <DataGrid x:Name="DestinationGrid" ItemsSource="{Binding Destinations}" AutoGenerateColumns="False"
+                                  CanUserAddRows="False" HeadersVisibility="Column" SelectionMode="Single"
+                                  AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Use" Width="40">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Folder" Binding="{Binding Path}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+
+                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                        <CheckBox Content="Create a subfolder for each source in the destination" IsChecked="{Binding SubfolderPerSource}"/>
+                        <TextBlock Text="An empty subfolder name uses the name of the source folder. Folders can be dragged in from Explorer."
+                                   FontSize="11" Foreground="{DynamicResource AppSubtextBrush}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Filters">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.ColumnSpan="3" Margin="0,0,0,8">
+                        <TextBlock Text="Skip development files" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <CheckBox Content="Build output — bin and obj folders next to a project file" IsChecked="{Binding SkipBuildOutput}" Margin="0,2"/>
+                        <CheckBox Content="Visual Studio working files — .vs folders, *.suo and project .user files" IsChecked="{Binding SkipVisualStudioFiles}" Margin="0,2"/>
+                        <CheckBox Content="Git data — .git folders (the backup will not contain the repository history)" IsChecked="{Binding SkipGitData}" Margin="0,2"/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,8,0,0"
+                                   Foreground="{DynamicResource AppSubtextBrush}"
+                                   Text="One pattern per line. Use * and ? as wildcards. A pattern containing a backslash is compared with the path, otherwise with the name. An empty include box includes everything."/>
+                    </StackPanel>
+                    <GroupBox Grid.Row="1" Header="Include files" Foreground="{DynamicResource AppTextBrush}">
+                        <TextBox Text="{Binding IncludeFiles}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1" Grid.Column="2" Header="Exclude files" Foreground="{DynamicResource AppTextBrush}">
+                        <TextBox Text="{Binding ExcludeFiles}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Header="Include folders" Foreground="{DynamicResource AppTextBrush}">
+                        <TextBox Text="{Binding IncludeFolders}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Grid.Column="2" Header="Exclude folders" Foreground="{DynamicResource AppTextBrush}">
+                        <TextBox Text="{Binding ExcludeFolders}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Options">
+                <StackPanel Margin="16,12">
+                    <TextBlock Text="Overwrite existing files" Margin="0,0,0,4"/>
+                    <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Overwrite}">
+                        <ComboBoxItem Content="Automatic — suited to the copy mode" Tag="{x:Static m:OverwriteRule.Automatic}"/>
+                        <ComboBoxItem Content="When the source is newer" Tag="{x:Static m:OverwriteRule.Newer}"/>
+                        <ComboBoxItem Content="When size or date is different" Tag="{x:Static m:OverwriteRule.Different}"/>
+                        <ComboBoxItem Content="Always" Tag="{x:Static m:OverwriteRule.Always}"/>
+                        <ComboBoxItem Content="Never" Tag="{x:Static m:OverwriteRule.Never}"/>
+                    </ComboBox>
+                    <TextBlock Text="Sync conflicts — when a file differs and both sides may have changed" Margin="0,14,0,4"/>
+                    <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Conflicts}">
+                        <ComboBoxItem Content="Skip and report" Tag="{x:Static m:ConflictRule.Skip}"/>
+                        <ComboBoxItem Content="The newer file wins" Tag="{x:Static m:ConflictRule.Newer}"/>
+                        <ComboBoxItem Content="The source wins" Tag="{x:Static m:ConflictRule.Source}"/>
+                        <ComboBoxItem Content="The destination wins" Tag="{x:Static m:ConflictRule.Destination}"/>
+                    </ComboBox>
+                    <CheckBox Content="Create empty folders" IsChecked="{Binding CreateEmptyFolders}" Margin="0,14,0,0"/>
+                    <CheckBox Content="Verify each copied file against its source" IsChecked="{Binding Verify}" Margin="0,8,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                        <TextBlock Text="Retry a failed item" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Retries}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="time(s), waiting" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding RetryDelaySeconds}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="second(s)" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Safety">
+                <StackPanel Margin="16,12">
+                    <TextBlock Text="Removed and replaced files" Margin="0,0,0,4"/>
+                    <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Removed}">
+                        <ComboBoxItem Content="Move to the Recycle Bin" Tag="{x:Static m:RemovedItems.RecycleBin}"/>
+                        <ComboBoxItem Content="Move to a version folder" Tag="{x:Static m:RemovedItems.VersionFolder}"/>
+                        <ComboBoxItem Content="Delete permanently" Tag="{x:Static m:RemovedItems.Permanent}"/>
+                    </ComboBox>
+                    <TextBlock Text="Network and removable drives have no Recycle Bin. Use a version folder for them."
+                               FontSize="11" Foreground="{DynamicResource AppSubtextBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="Version folder" Margin="0,14,0,4"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Browse..." Padding="8,2" Margin="6,0,0,0" Click="BrowseVersions_Click"/>
+                        <TextBox x:Name="VersionFolderBox" Text="{Binding VersionFolder}" Padding="3"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Keep the newest" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding VersionGenerations}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="version sets (0 = all)" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Safeguard" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Stop when more than" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding MaxDeletePercent}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="% of files would be deleted, if that is more than" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding MaxDeleteMinimum}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="files" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Backup">
+                <StackPanel Margin="16,12">
+                    <TextBlock Text="These settings apply to the Backup copy mode." Foreground="{DynamicResource AppSubtextBrush}" Margin="0,0,0,12"/>
+                    <TextBlock Text="Store each backup as" Margin="0,0,0,4"/>
+                    <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding BackupStyle}">
+                        <ComboBoxItem Content="A dated folder" Tag="{x:Static m:BackupStyle.DatedFolder}"/>
+                        <ComboBoxItem Content="A ZIP file" Tag="{x:Static m:BackupStyle.Zip}"/>
+                    </ComboBox>
+                    <TextBlock Text="Name — {profile}, {date} and {time} are replaced" Margin="0,14,0,4"/>
+                    <TextBox Text="{Binding BackupName}" Padding="3"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <TextBlock Text="Keep the newest" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding BackupGenerations}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="complete backups (0 = all)" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Older backups are deleted permanently." FontSize="11"
+                               Foreground="{DynamicResource AppSubtextBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="ZIP compression" Margin="0,14,0,4"/>
+                    <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Compression}">
+                        <ComboBoxItem Content="Normal" Tag="{x:Static m:ZipCompression.Optimal}"/>
+                        <ComboBoxItem Content="Fast" Tag="{x:Static m:ZipCompression.Fastest}"/>
+                        <ComboBoxItem Content="None" Tag="{x:Static m:ZipCompression.Stored}"/>
+                    </ComboBox>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Schedule">
+                <StackPanel Margin="16,12">
+                    <TextBlock Text="Run this profile" Margin="0,0,0,4"/>
+                    <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Schedule.Kind}">
+                        <ComboBoxItem Content="Manually" Tag="{x:Static m:ScheduleKind.Manual}"/>
+                        <ComboBoxItem Content="Once" Tag="{x:Static m:ScheduleKind.Once}"/>
+                        <ComboBoxItem Content="At an interval" Tag="{x:Static m:ScheduleKind.Interval}"/>
+                        <ComboBoxItem Content="Daily" Tag="{x:Static m:ScheduleKind.Daily}"/>
+                        <ComboBoxItem Content="Weekly" Tag="{x:Static m:ScheduleKind.Weekly}"/>
+                        <ComboBoxItem Content="Monthly" Tag="{x:Static m:ScheduleKind.Monthly}"/>
+                    </ComboBox>
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <TextBlock Text="Start date" VerticalAlignment="Center"/>
+                        <DatePicker SelectedDate="{Binding Schedule.Date}" Width="140" Margin="8,0,18,0"/>
+                        <TextBlock Text="Time (24 hour)" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Schedule.Time}" Width="60" Margin="8,0" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <TextBlock Text="Interval: every" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Schedule.IntervalMinutes}" Width="60" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="minute(s)" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Weekly: on these days" Margin="0,14,0,4"/>
+                    <WrapPanel>
+                        <CheckBox Content="Mon" IsChecked="{Binding Schedule.Monday}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Tue" IsChecked="{Binding Schedule.Tuesday}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Wed" IsChecked="{Binding Schedule.Wednesday}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Thu" IsChecked="{Binding Schedule.Thursday}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Fri" IsChecked="{Binding Schedule.Friday}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Sat" IsChecked="{Binding Schedule.Saturday}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Sun" IsChecked="{Binding Schedule.Sunday}"/>
+                    </WrapPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <TextBlock Text="Monthly: on day" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Schedule.DayOfMonth}" Width="45" Margin="8,0" TextAlignment="Center"/>
+                        <TextBlock Text="(later days use the end of shorter months)" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <CheckBox Content="Run a missed schedule as soon as possible" IsChecked="{Binding Schedule.RunMissed}" Margin="0,16,0,0"/>
+                    <CheckBox Content="Also run when WinBackup starts" IsChecked="{Binding Schedule.OnStartup}" Margin="0,8,0,0"/>
+                    <TextBlock Text="Schedules work only while WinBackup is running, in a window or in the system tray."
+                               Foreground="{DynamicResource AppSubtextBrush}" Margin="0,14,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
