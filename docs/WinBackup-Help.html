@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WinBackup Help</title>
+<style>
+:root { color-scheme: light dark; --text: #212121; --back: #ffffff; --panel: #f5f5f5; --line: #dcdcdc; --accent: #1967bf; }
+@media (prefers-color-scheme: dark) { :root { --text: #d4d4d4; --back: #1e1e1e; --panel: #252526; --line: #3f3f46; --accent: #6cb0ff; } }
+body { font-family: "Segoe UI", sans-serif; line-height: 1.55; color: var(--text); background: var(--back); margin: 0; }
+main { max-width: 860px; margin: 0 auto; padding: 24px; }
+h1 { margin-bottom: 0; }
+h2 { border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-top: 36px; }
+a { color: var(--accent); }
+nav { background: var(--panel); border: 1px solid var(--line); padding: 12px 24px; columns: 2; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: var(--panel); }
+code { background: var(--panel); padding: 1px 4px; }
+.note { border-left: 4px solid var(--accent); background: var(--panel); padding: 8px 14px; }
+</style>
+</head>
+<body>
+<main>
+<h1>WinBackup Help</h1>
+<p>Backup and synchronization for 64-bit Windows.</p>
+
+<nav>
+<ol>
+<li><a href="#start">Getting started</a></li>
+<li><a href="#window">The main window</a></li>
+<li><a href="#profiles">Profiles</a></li>
+<li><a href="#folders">Folders</a></li>
+<li><a href="#modes">Copy modes</a></li>
+<li><a href="#filters">Filters</a></li>
+<li><a href="#options">Options</a></li>
+<li><a href="#safety">Safety</a></li>
+<li><a href="#backup">Backup mode</a></li>
+<li><a href="#sync">Sync mode</a></li>
+<li><a href="#preview">Preview</a></li>
+<li><a href="#running">Running jobs</a></li>
+<li><a href="#schedule">Scheduler</a></li>
+<li><a href="#reports">Reports and logs</a></li>
+<li><a href="#email">Email notification</a></li>
+<li><a href="#settings">Settings and tray</a></li>
+<li><a href="#files">Where data is stored</a></li>
+<li><a href="#trouble">Troubleshooting</a></li>
+</ol>
+</nav>
+
+<h2 id="start">Getting started</h2>
+<ol>
+<li>Place the WinBackup folder somewhere you can write to, then run <code>WinBackup.exe</code>. Avoid <code>Program Files</code>.</li>
+<li>Choose <b>New Profile</b>.</li>
+<li>Enter a name and choose a copy mode.</li>
+<li>On the <b>Folders</b> tab add at least one source and one destination, then choose <b>Save</b>.</li>
+<li>Choose <b>Preview</b> to see what will happen, then <b>Run</b>.</li>
+</ol>
+<p class="note">Use Preview the first time you run any profile, and after changing its folders, mode or filters.</p>
+
+<h2 id="window">The main window</h2>
+<p>The list on the left holds your profiles and profile folders. The panel on the right describes the selected item. The buttons above start common tasks.</p>
+<table>
+<tr><th>Menu</th><th>Commands</th></tr>
+<tr><td>File</td><td>New Profile, New Folder, Exit</td></tr>
+<tr><td>Profile</td><td>Edit, Copy, Rename, Delete</td></tr>
+<tr><td>Run</td><td>Preview, Start Selected, Start All Enabled, Pause / Resume, Cancel</td></tr>
+<tr><td>View</td><td>Settings, Reports, Log Viewer</td></tr>
+<tr><td>Help</td><td>Help Contents, About</td></tr>
+</table>
+<table>
+<tr><th>Key</th><th>Action</th></tr>
+<tr><td>F1</td><td>Open this help</td></tr>
+<tr><td>F5</td><td>Start the selected profile or folder</td></tr>
+<tr><td>Enter</td><td>Edit the selected profile</td></tr>
+<tr><td>F2</td><td>Rename</td></tr>
+<tr><td>Delete</td><td>Delete the selected profile or folder</td></tr>
+</table>
+
+<h2 id="profiles">Profiles</h2>
+<p>A profile stores everything about one job. Right-click the list for profile commands.</p>
+<ul>
+<li><b>Folders</b> group profiles. Create one with New Folder, then choose it on a profile's General tab. Deleting a folder moves its profiles to the top level.</li>
+<li><b>Check boxes</b> enable and disable profiles. Disabled profiles are skipped by Start All, by starting a folder, and by the scheduler. They can still be started one at a time.</li>
+<li><b>Deleting</b> a profile never removes backed up files.</li>
+</ul>
+
+<h2 id="folders">Folders</h2>
+<ul>
+<li>A profile can have several source and several destination folders. Every used source is processed with every used destination.</li>
+<li>Clear <b>Use</b> to leave a folder out without removing it.</li>
+<li>Add folders with <b>Add</b>, by typing with <b>Add Text</b>, or by dragging them from Explorer.</li>
+<li>Windows environment variables work, for example <code>%USERPROFILE%\Documents</code>. Network paths such as <code>\\server\share\folder</code> work too.</li>
+<li><b>Create a subfolder for each source</b> keeps several sources apart in the destination. An empty subfolder name uses the source folder's name. Mirror needs this option when there is more than one source.</li>
+<li>Sources and destinations cannot be the same or contain each other.</li>
+</ul>
+
+<h2 id="modes">Copy modes</h2>
+<table>
+<tr><th>Mode</th><th>Copies</th><th>Deletes</th></tr>
+<tr><td>Mirror</td><td>New and different files from source to destination</td><td>Destination items that are not in the source</td></tr>
+<tr><td>Update</td><td>New and newer files from source to destination</td><td>Nothing</td></tr>
+<tr><td>Backup</td><td>Everything, into a new dated folder or ZIP file</td><td>Only old backups beyond the number you keep</td></tr>
+<tr><td>Sync</td><td>New and changed files in both directions</td><td>Items you deleted on one side since the last sync</td></tr>
+</table>
+
+<h2 id="filters">Filters</h2>
+<h3>Skip development files</h3>
+<table>
+<tr><th>Choice</th><th>Skips</th></tr>
+<tr><td>Build output</td><td><code>bin</code> and <code>obj</code> folders that sit beside a project file such as <code>.csproj</code> or <code>.vcxproj</code>. Other folders with these names, such as those belonging to installed programs and games, are still copied.</td></tr>
+<tr><td>Visual Studio working files</td><td><code>.vs</code> folders, <code>*.suo</code> files and project <code>.user</code> files</td></tr>
+<tr><td>Git data</td><td><code>.git</code> folders. The copy then has no repository history, including commits that exist only on your computer.</td></tr>
+</table>
+<p class="note">All choices are off until you select them. On their own, like other filters, they leave copies that already exist in a destination untouched.</p>
+<h3>Remove skipped development files from the destination</h3>
+<ul>
+<li>Works only in Mirror mode and is off until you select it.</li>
+<li>Deletes what the three choices above skip, where it already exists in a destination. Each item is listed in Preview as a deletion with the reason <b>Skipped development file</b>.</li>
+<li>Only the choices you selected are cleaned up. Items matched by your exclude patterns, or left out by your include patterns, are kept. Links and junctions are kept.</li>
+<li>Deletions follow the profile's <a href="#safety">Safety</a> settings. With the Recycle Bin, space is freed only after you empty it. Items that cannot go to the Recycle Bin are kept and reported.</li>
+<li>A large first cleanup may trigger the safeguard. Check the list in Preview, then run from there. Until then, scheduled and direct runs change nothing for that folder pair.</li>
+</ul>
+<h3>Patterns</h3>
+<p>Enter one pattern per line. <code>*</code> matches any text and <code>?</code> matches one character. Matching ignores upper and lower case.</p>
+<table>
+<tr><th>Pattern</th><th>Matches</th></tr>
+<tr><td><code>*.tmp</code></td><td>Every file ending in .tmp</td></tr>
+<tr><td><code>cache</code></td><td>Anything named cache (in a folder box, every folder named cache)</td></tr>
+<tr><td><code>Projects\Old</code></td><td>The path Projects\Old inside a source</td></tr>
+<tr><td><code>*\obj</code></td><td>In a folder box, folders named obj at any level</td></tr>
+</table>
+<ul>
+<li>A pattern containing a backslash is compared with the path, otherwise with the name.</li>
+<li>An empty include box includes everything.</li>
+<li>With <b>Include folders</b>, only files inside matching folders are processed.</li>
+<li>Exclude rules win over include rules.</li>
+<li>Filtered items are ignored on both sides. Mirror and Sync never delete a filtered file. A folder that still holds filtered files is kept.</li>
+</ul>
+
+<h2 id="options">Options</h2>
+<table>
+<tr><th>Option</th><th>Effect</th></tr>
+<tr><td>Overwrite existing files</td><td>Automatic uses "different" for Mirror and "newer" for Update. This option does not apply to Backup or Sync.</td></tr>
+<tr><td>Sync conflicts</td><td>See <a href="#sync">Sync mode</a>.</td></tr>
+<tr><td>Create empty folders</td><td>Also creates folders that contain nothing.</td></tr>
+<tr><td>Verify</td><td>Reads each copy back and compares it with what was read from the source. This takes longer.</td></tr>
+<tr><td>Retry</td><td>How often a failed item is tried again, and the wait between tries. The run then carries on with the next item.</td></tr>
+</table>
+<p>File times are compared with a tolerance of two seconds.</p>
+
+<h2 id="safety">Safety</h2>
+<h3>Removed and replaced files</h3>
+<table>
+<tr><th>Choice</th><th>Effect</th></tr>
+<tr><td>Recycle Bin</td><td>The default. Works on local fixed drives and for paths shorter than 260 characters. When a file cannot go to the Recycle Bin it is left in place and reported as an error. Windows may ask for confirmation if a file is too large for the Recycle Bin.</td></tr>
+<tr><td>Version folder</td><td>Files are moved to <code>version folder\profile\date_time\original folder\...</code>. Works on any drive and with long paths. You can limit the number of version sets kept.</td></tr>
+<tr><td>Delete permanently</td><td>Files cannot be recovered.</td></tr>
+</table>
+<p>Empty folders are removed directly. A folder is only removed when it is empty.</p>
+<h3>Safeguards</h3>
+<ul>
+<li>If a source folder is not available, nothing is changed for it.</li>
+<li>If one side contains no files and files would be deleted from the other, the folder pair is stopped.</li>
+<li>If more files would be deleted than your limit allows, the folder pair is stopped. The default is more than 50% and more than 10 files.</li>
+<li>A stopped pair can be run from the Preview window after you confirm. Scheduled and direct runs never override a safeguard.</li>
+<li>If a folder cannot be read, the matching items on the other side are not deleted.</li>
+<li>Links and junctions are not followed and are never deleted.</li>
+<li>A copy is written to a temporary file first. The existing file is replaced only after the copy succeeds.</li>
+<li><code>$RECYCLE.BIN</code> and <code>System Volume Information</code> at the top of a drive are ignored.</li>
+</ul>
+
+<h2 id="backup">Backup mode</h2>
+<ul>
+<li>Each run creates a new folder or ZIP file in every destination.</li>
+<li>The name may use <code>{profile}</code>, <code>{date}</code> and <code>{time}</code>. A number is added if the name already exists.</li>
+<li><b>Keep the newest</b> sets how many complete backups remain. 0 keeps all. Older backups are deleted permanently.</li>
+<li>A backup is complete only when it finished without errors, contains files, and nothing was skipped. Old backups are removed only after a complete backup.</li>
+<li>WinBackup removes only backups it recorded itself. Other files in the destination are left alone. If the <code>config</code> folder is lost, earlier backups are no longer removed automatically.</li>
+<li>A ZIP file appears only when it is finished. ZIP passwords and split archives are not available.</li>
+</ul>
+
+<h2 id="sync">Sync mode</h2>
+<p>Sync keeps one destination and its sources up to date in both directions. After each run it remembers the matching files, which lets it tell a new file from a deleted one.</p>
+<ul>
+<li>On the first run nothing is deleted. Files present on one side are copied to the other.</li>
+<li>A file changed on one side is copied to the other.</li>
+<li>A file deleted on one side and unchanged on the other is deleted there.</li>
+<li>A file changed on one side and deleted on the other is restored.</li>
+<li>A conflict occurs when both copies differ and it is unclear which should win. Choose to skip and report it, or let the newer file, the source, or the destination win. In Preview you can decide for each item.</li>
+<li>If the destination folder disappears after a sync, nothing is changed.</li>
+</ul>
+
+<h2 id="preview">Preview</h2>
+<ul>
+<li>Preview compares the folders without changing anything. Only items that need attention are listed.</li>
+<li>Preview compares names, sizes and dates and does not read file contents, so it is much quicker than copying.</li>
+<li>The totals above the list show the files, folders and size compared on each side, what the filters skipped, and the time taken. A skipped folder counts once and its contents are not counted.</li>
+<li>Use <b>Show</b> to list copies, deletions or skipped items.</li>
+<li>Each row is colored by its action: green copies to the destination, blue copies to the source, red deletes in the destination, purple deletes in the source, and yellow is skipped. A legend is shown below the list. A selected row shows the selection color instead.</li>
+<li>Select one or more rows and right-click to change their action.</li>
+<li>Warnings, unreadable folders and safeguards appear below the list.</li>
+<li><b>Run</b> carries out the list as shown. Use <b>Refresh</b> if files or the profile have changed since the preview was made. Refresh uses the latest saved profile.</li>
+</ul>
+
+<h2 id="running">Running jobs</h2>
+<p>Jobs run in the background, one at a time. Further jobs wait in line. The panel at the bottom of the main window shows progress and has <b>Pause</b> and <b>Cancel</b>. Cancel stops the current job and clears the line. A partly copied file is removed.</p>
+
+<h2 id="schedule">Scheduler</h2>
+<table>
+<tr><th>Choice</th><th>Runs</th></tr>
+<tr><td>Once</td><td>At the start date and time</td></tr>
+<tr><td>Interval</td><td>Every set number of minutes, counted from the start date and time</td></tr>
+<tr><td>Daily</td><td>Every day at the time</td></tr>
+<tr><td>Weekly</td><td>On the selected days at the time</td></tr>
+<tr><td>Monthly</td><td>On the day of the month at the time. Day 31 means the last day of shorter months.</td></tr>
+</table>
+<ul>
+<li>Schedules work only while WinBackup is running. Keep it in the system tray. WinBackup does not add itself to Windows startup.</li>
+<li>A run more than five minutes late is treated as missed. Select <b>Run a missed schedule</b> to run it anyway.</li>
+<li><b>Also run when WinBackup starts</b> works with any choice, including Manually.</li>
+</ul>
+
+<h2 id="reports">Reports and logs</h2>
+<p><b>Reports</b> lists every run with its result. Select a run to see each item, and use <b>Show</b> to see only errors, or errors and warnings.</p>
+<p>The <b>Log Viewer</b> shows the daily application log with a text filter.</p>
+<p>Logs and reports older than the number of days under Settings, Logging are removed at startup.</p>
+
+<h2 id="email">Email notification</h2>
+<p>Under Settings, Email enter your SMTP server, port, sender and recipients, choose when to send, and use <b>Send Test</b>.</p>
+<ul>
+<li>TLS uses STARTTLS, normally on port 587. Servers that only accept implicit TLS on port 465 are not supported.</li>
+<li>Services that require browser sign-in are not supported. Some providers offer an app password for SMTP.</li>
+<li>The password is encrypted for your Windows account. Enter it again after moving WinBackup to another computer or user.</li>
+</ul>
+
+<h2 id="settings">Settings and tray</h2>
+<table>
+<tr><th>Tab</th><th>Contents</th></tr>
+<tr><td>General</td><td>Close to tray, confirm exit, start minimized</td></tr>
+<tr><td>Windows</td><td>Light or dark theme, always on top and taskbar options for each window</td></tr>
+<tr><td>Tray</td><td>Notifications</td></tr>
+<tr><td>Email</td><td>Mail server and when to send reports</td></tr>
+<tr><td>Logging</td><td>How long logs and reports are kept</td></tr>
+</table>
+<p>Windows remember their position and size.</p>
+<p>The tray icon shows a green dot while running, orange while paused, and red after a run with errors. Double-click it to open WinBackup, or right-click for commands.</p>
+<h2 id="files">Where data is stored</h2>
+<p>Everything is kept in the WinBackup folder.</p>
+<table>
+<tr><th>Location</th><th>Contents</th></tr>
+<tr><td><code>config</code></td><td>Settings, profiles, sync history, backup history and schedule history</td></tr>
+<tr><td><code>logs</code></td><td>Daily logs</td></tr>
+<tr><td><code>logs\reports</code></td><td>Run reports</td></tr>
+<tr><td><code>docs</code></td><td>This help</td></tr>
+</table>
+<p>To move or protect your setup, copy the <code>config</code> folder while WinBackup is closed.</p>
+
+<h2 id="trouble">Troubleshooting</h2>
+<table>
+<tr><th>Message or problem</th><th>What to do</th></tr>
+<tr><td>A file is being used by another process</td><td>Close the program using it. Files locked by another program cannot be copied.</td></tr>
+<tr><td>Access is denied</td><td>Check that your account may read the source and write the destination.</td></tr>
+<tr><td>This drive has no Recycle Bin</td><td>On the Safety tab, choose a version folder.</td></tr>
+<tr><td>Nothing was changed (safeguard)</td><td>Open Preview, check the deletions, then run from there if they are right.</td></tr>
+<tr><td>A scheduled run did not happen</td><td>Check that WinBackup was running and the profile is enabled, then look in the log.</td></tr>
+<tr><td>Mapped drive not found</td><td>Use the network path instead of the drive letter.</td></tr>
+<tr><td>Files copied again after a clock change</td><td>Some drive formats store local time. Run the profile once to bring the times up to date.</td></tr>
+</table>
+<p>File permissions and alternate data streams are not copied. Folder dates are not preserved.</p>
+</main>
+</body>
+</html>
