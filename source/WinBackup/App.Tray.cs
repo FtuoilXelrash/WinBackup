@@ -14,7 +14,11 @@ public partial class App
         Tray.OpenRequested += ShowMainWindow;
         Tray.AddCommand("Open WinBackup", ShowMainWindow);
         Tray.AddCommand("Settings", () => ShowTool(() => new SettingsWindow()));
+        Tray.AddCommand("Reports", () => ShowTool(() => new ReportsWindow()));
         Tray.AddCommand("Log Viewer", () => ShowTool(() => new LogViewerWindow()));
+        Tray.AddSeparator();
+        Tray.AddCommand("Pause / Resume", Jobs.TogglePause, () => Jobs.IsBusy);
+        Tray.AddCommand("Cancel Jobs", Jobs.CancelAll, () => Jobs.IsBusy);
         Tray.AddSeparator();
         Tray.AddCommand("Exit", () =>
         {
