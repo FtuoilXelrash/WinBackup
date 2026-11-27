@@ -29,7 +29,7 @@ public static class SyncState
     {
         if (!Directory.Exists(pair.SourceRoot) || !Directory.Exists(pair.DestinationRoot)) return;
 
-        var filter = new FilterSet(profile);
+        var filter = new FilterSet(profile) { ProjectRoots = new[] { pair.SourceRoot, pair.DestinationRoot } };
         using var control = new RunControl();
         var source = Scanner.Scan(pair.SourceRoot, pair.SourceRoot, filter, control);
         var destination = Scanner.Scan(pair.DestinationRoot, pair.SourceRoot, filter, control);

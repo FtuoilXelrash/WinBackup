@@ -94,6 +94,9 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
+            <TextBlock x:Name="UpToDateText" Text="Everything is up to date" FontSize="28" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"
+                       Visibility="Collapsed"/>
             <StackPanel x:Name="BusyPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Width="520">
                 <TextBlock Text="Comparing folders..." HorizontalAlignment="Center"/>
                 <ProgressBar IsIndeterminate="True" Height="10" Margin="0,8"/>

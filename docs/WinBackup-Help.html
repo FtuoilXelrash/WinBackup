@@ -23,7 +23,7 @@ code { background: var(--panel); padding: 1px 4px; }
 <body>
 <main>
 <h1>WinBackup Help</h1>
-<p>Backup and synchronization for 64-bit Windows.</p>
+<p>Backup and synchronization for 64-bit Windows. Version 1.0.0.</p>
 
 <nav>
 <ol>
@@ -54,12 +54,14 @@ code { background: var(--panel); padding: 1px 4px; }
 <li>Choose <b>New Profile</b>.</li>
 <li>Enter a name and choose a copy mode.</li>
 <li>On the <b>Folders</b> tab add at least one source and one destination, then choose <b>Save</b>.</li>
-<li>Choose <b>Preview</b> to see what will happen, then <b>Run</b>.</li>
+<li>Highlight the profile and choose <b>Preview</b> to see what will happen, then <b>Run</b>.</li>
 </ol>
 <p class="note">Use Preview the first time you run any profile, and after changing its folders, mode or filters.</p>
 
 <h2 id="window">The main window</h2>
-<p>The list on the left holds your profiles and profile folders. The panel on the right describes the selected item. The buttons above start common tasks.</p>
+<p>The list on the left holds your profiles and profile folders. The panel on the right describes the highlighted item. The buttons above start common tasks.</p>
+<p>Preview and Start work on the <b>highlighted</b> item, not on every ticked one. Clicking a name or its check box highlights it. The profile you highlighted last is highlighted again when WinBackup starts.</p>
+<p>Preview is greyed out unless a profile is highlighted. Start is greyed out unless a profile or folder is highlighted. Start All is always available.</p>
 <table>
 <tr><th>Menu</th><th>Commands</th></tr>
 <tr><td>File</td><td>New Profile, New Folder, Exit</td></tr>
@@ -135,7 +137,7 @@ code { background: var(--panel); padding: 1px 4px; }
 <li>An empty include box includes everything.</li>
 <li>With <b>Include folders</b>, only files inside matching folders are processed.</li>
 <li>Exclude rules win over include rules.</li>
-<li>Filtered items are ignored on both sides. Mirror and Sync never delete a filtered file. A folder that still holds filtered files is kept.</li>
+<li>Filtered items are ignored on both sides. Mirror and Sync do not delete a filtered file, except where you select the removal of skipped development files in a Mirror profile. A folder that still holds filtered files is kept.</li>
 </ul>
 
 <h2 id="options">Options</h2>
@@ -196,6 +198,7 @@ code { background: var(--panel); padding: 1px 4px; }
 <li>Preview compares the folders without changing anything. Only items that need attention are listed.</li>
 <li>Preview compares names, sizes and dates and does not read file contents, so it is much quicker than copying.</li>
 <li>The totals above the list show the files, folders and size compared on each side, what the filters skipped, and the time taken. A skipped folder counts once and its contents are not counted.</li>
+<li><b>Everything is up to date</b> appears when nothing needs to be copied or deleted and every folder was compared. If a folder could not be compared or read, check the warnings below the list. Backup mode always copies, so it does not show this message.</li>
 <li>Use <b>Show</b> to list copies, deletions or skipped items.</li>
 <li>Each row is colored by its action: green copies to the destination, blue copies to the source, red deletes in the destination, purple deletes in the source, and yellow is skipped. A legend is shown below the list. A selected row shows the selection color instead.</li>
 <li>Select one or more rows and right-click to change their action.</li>
@@ -243,8 +246,10 @@ code { background: var(--panel); padding: 1px 4px; }
 <tr><td>Email</td><td>Mail server and when to send reports</td></tr>
 <tr><td>Logging</td><td>How long logs and reports are kept</td></tr>
 </table>
-<p>Windows remember their position and size.</p>
+<p>Windows remember their position and size. The About window, under the Help menu, shows the version.</p>
 <p>The tray icon shows a green dot while running, orange while paused, and red after a run with errors. Double-click it to open WinBackup, or right-click for commands.</p>
+<p>With <b>Close to system tray</b> selected, closing the main window keeps WinBackup running. Choose <b>Exit</b> from the tray icon or the File menu to close it.</p>
+
 <h2 id="files">Where data is stored</h2>
 <p>Everything is kept in the WinBackup folder.</p>
 <table>
@@ -264,6 +269,10 @@ code { background: var(--panel); padding: 1px 4px; }
 <tr><td>This drive has no Recycle Bin</td><td>On the Safety tab, choose a version folder.</td></tr>
 <tr><td>Nothing was changed (safeguard)</td><td>Open Preview, check the deletions, then run from there if they are right.</td></tr>
 <tr><td>A scheduled run did not happen</td><td>Check that WinBackup was running and the profile is enabled, then look in the log.</td></tr>
+<tr><td>Preview or Start is greyed out</td><td>Click a profile to highlight it. Preview needs a profile, not a folder.</td></tr>
+<tr><td>Preview finishes very quickly</td><td>This is normal. Only names, sizes and dates are compared. Check the totals above the list to see what was compared.</td></tr>
+<tr><td>Skipped development files are still in the destination</td><td>In a Mirror profile, select <b>Remove skipped development files from the destination</b> on the Filters tab, then use Preview. With the Recycle Bin, empty it to free the space.</td></tr>
+<tr><td>A database, mail file or virtual machine copy will not open</td><td>Close the program, or shut down the virtual machine, and run the profile again.</td></tr>
 <tr><td>Mapped drive not found</td><td>Use the network path instead of the drive letter.</td></tr>
 <tr><td>Files copied again after a clock change</td><td>Some drive formats store local time. Run the profile once to bring the times up to date.</td></tr>
 </table>

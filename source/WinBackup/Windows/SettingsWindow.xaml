@@ -19,8 +19,7 @@
                     <TextBlock Text="General Behavior" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <CheckBox Content="Close to system tray when window is closed" IsChecked="{Binding CloseToTray}" Margin="0,4"/>
                     <CheckBox Content="Confirm before exiting" IsChecked="{Binding ConfirmExit}" Margin="0,4"/>
-                    <CheckBox Content="Start minimized (tray only, no window on launch)" IsChecked="{Binding StartMinimized}" Margin="0,4"/>
-                </StackPanel>
+                    <CheckBox Content="Start minimized (tray only, no window on launch)" IsChecked="{Binding StartMinimized}" Margin="0,4"/>                </StackPanel>
             </TabItem>
 
             <TabItem Header="Windows">
@@ -47,9 +46,58 @@
                         <CheckBox Content="Always on top" IsChecked="{Binding Windows.ProfileEditor.AlwaysOnTop}" Margin="0,3"/>
                         <CheckBox Content="Show in the taskbar" IsChecked="{Binding Windows.ProfileEditor.ShowInTaskbar}" Margin="0,3"/>
 
+                        <TextBlock Text="Preview Window" FontWeight="SemiBold" Margin="0,14,0,6"/>
+                        <CheckBox Content="Always on top" IsChecked="{Binding Windows.Preview.AlwaysOnTop}" Margin="0,3"/>
+                        <CheckBox Content="Show in the taskbar" IsChecked="{Binding Windows.Preview.ShowInTaskbar}" Margin="0,3"/>
+
+                        <TextBlock Text="Reports Window" FontWeight="SemiBold" Margin="0,14,0,6"/>
+                        <CheckBox Content="Always on top" IsChecked="{Binding Windows.Reports.AlwaysOnTop}" Margin="0,3"/>
+                        <CheckBox Content="Show in the taskbar" IsChecked="{Binding Windows.Reports.ShowInTaskbar}" Margin="0,3"/>
+
                         <TextBlock Text="Log Viewer" FontWeight="SemiBold" Margin="0,14,0,6"/>
                         <CheckBox Content="Always on top" IsChecked="{Binding Windows.LogViewer.AlwaysOnTop}" Margin="0,3"/>
                         <CheckBox Content="Show in the taskbar" IsChecked="{Binding Windows.LogViewer.ShowInTaskbar}" Margin="0,3"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Tray">
+                <StackPanel Margin="16,12">
+                    <TextBlock Text="Notifications" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <CheckBox Content="Show a notification when a job finishes" IsChecked="{Binding ShowNotifications}" Margin="0,4"/>
+                    <CheckBox Content="Only when there is a problem" IsChecked="{Binding NotifyOnlyProblems}" Margin="16,4,0,4"/>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Email">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16,12">
+                    <StackPanel>
+                        <TextBlock Text="Send a report" Margin="0,0,0,4"/>
+                        <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Email.When}">
+                            <ComboBoxItem Content="Never" Tag="{x:Static m:EmailWhen.Never}"/>
+                            <ComboBoxItem Content="After every run" Tag="{x:Static m:EmailWhen.Always}"/>
+                            <ComboBoxItem Content="When there are errors or warnings" Tag="{x:Static m:EmailWhen.Problems}"/>
+                            <ComboBoxItem Content="When files changed" Tag="{x:Static m:EmailWhen.Changes}"/>
+                            <ComboBoxItem Content="When there are problems or changes" Tag="{x:Static m:EmailWhen.ProblemsOrChanges}"/>
+                        </ComboBox>
+                        <TextBlock Text="SMTP server" Margin="0,10,0,3"/>
+                        <TextBox Text="{Binding Email.Server}" Padding="2"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <TextBlock Text="Port" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Email.Port}" Width="60" Margin="8,0,18,0" TextAlignment="Center"/>
+                            <CheckBox Content="Use TLS (STARTTLS)" IsChecked="{Binding Email.UseTls}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="User name" Margin="0,8,0,3"/>
+                        <TextBox Text="{Binding Email.User}" Padding="2"/>
+                        <TextBlock Text="Password" Margin="0,8,0,3"/>
+                        <PasswordBox x:Name="PasswordBox" Padding="2"/>
+                        <TextBlock x:Name="PasswordHint" FontSize="11" Foreground="{DynamicResource AppSubtextBrush}"/>
+                        <TextBlock Text="From address" Margin="0,8,0,3"/>
+                        <TextBox Text="{Binding Email.From}" Padding="2"/>
+                        <TextBlock Text="To (separate several addresses with commas)" Margin="0,8,0,3"/>
+                        <TextBox Text="{Binding Email.To}" Padding="2"/>
+                        <Button Content="Send Test" Width="100" HorizontalAlignment="Left" Margin="0,12,0,4" Click="TestEmail_Click"/>
+                        <TextBlock x:Name="EmailStatus" TextWrapping="Wrap"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

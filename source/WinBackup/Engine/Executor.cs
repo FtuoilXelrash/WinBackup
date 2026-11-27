@@ -315,7 +315,7 @@ public sealed partial class Executor
         }
 
         var otherInfo = item.Action == ItemAction.DeleteDestination ? item.Source : item.Destination;
-        if (otherInfo == null && Path.Exists(Path.Combine(other, item.RelativePath)))
+        if (!item.IsSkippedRemoval && otherInfo == null && Path.Exists(Path.Combine(other, item.RelativePath)))
         {
             _report.Skipped++;
             _report.Add(EntryLevel.Warning, "Skipped", path, "Not deleted because the item has reappeared on the other side.");

@@ -6,7 +6,7 @@ Windows backup utility
 Platform:  Windows x64
 Framework: .NET 10
 License:   GPL-3.0
-Status:    In development
+Version:   1.0.0
 
 
 OVERVIEW
@@ -16,8 +16,8 @@ WinBackup is a portable backup and synchronization application for 64-bit
 Windows. It stays responsive while it works, handles long file names, carries
 on when a single file fails, and reports on everything it did.
 
-Note: WinBackup is in early development. Test it on copies of your data and
-use Preview before relying on a profile.
+Note: Use Preview to check what a new or changed profile will do before you
+run it.
 
 
 CONTENTS
@@ -42,8 +42,10 @@ FEATURES
 
 - Profiles organized in folders, with enable and disable, copy, and rename
 - Multiple source and destination folders in each profile, with drag and drop
-- Preview of every planned action with comparison totals, and the ability to
-  change individual items before running
+- Preview of every planned action, color coded, with comparison totals and the
+  ability to change individual items before running
+- Fast comparison by name, size, and date, with a clear message when
+  everything is up to date
 - Background operation with progress, pause, and cancel
 - Long file name support
 - Reports for every run, with error filtering
@@ -124,6 +126,8 @@ SAFETY
   successfully
 - Folders that cannot be read are never treated as deleted
 - Links and junctions are not followed or deleted
+- Filtered files are left alone in the destination unless you choose to remove
+  skipped development files
 
 
 REQUIREMENTS
@@ -140,7 +144,8 @@ GETTING STARTED
    WinBackup.exe.
 2. Choose New Profile, enter a name, and pick a copy mode.
 3. Add source and destination folders and save.
-4. Choose Preview to check the planned actions, then Run.
+4. Highlight the profile, choose Preview to check the planned actions, then
+   Run.
 
 
 PORTABLE OPERATION
@@ -166,6 +171,10 @@ LIMITATIONS
 
 - Scheduled runs happen only while WinBackup is running
 - Files locked by other programs are reported and not copied
+- Files that another program is writing to may be copied in an unusable state,
+  so close databases, mail programs, and virtual machines first
+- Preview compares names, sizes, and dates, not file contents; verification
+  applies to files copied during a run
 - The Recycle Bin is available only for local fixed drives and shorter paths;
   use a version folder otherwise
 - File permissions and alternate data streams are not copied

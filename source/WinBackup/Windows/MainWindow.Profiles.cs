@@ -22,12 +22,25 @@ public partial class MainWindow
     {
         ProfileTree.SelectedItemChanged += (_, _) =>
         {
-            if (SelectedNode is { } node) _selectedKey = KeyOf(node);
+            if (SelectedNode is { } node)
+            {
+                _selectedKey = KeyOf(node);
+                if (node.Profile != null) RememberProfile(node.Profile.Id);
+            }
             ShowDetails();
         };
         App.Instance.Profiles.Changed += RebuildTree;
         Closed += (_, _) => App.Instance.Profiles.Changed -= RebuildTree;
+        var last = App.Instance.Settings.Current.LastProfileId;
+        if (last.Length > 0) _selectedKey = last;
         RebuildTree();
+    }
+
+    private static void RememberProfile(string id)
+    {
+        if (App.Instance.Settings.Current.LastProfileId == id) return;
+        App.Instance.Settings.Current.LastProfileId = id;
+        App.Instance.Settings.Save();
     }
 
     private static string KeyOf(ProfileNode node) => node.Profile?.Id ?? "folder:" + node.Name;
@@ -65,6 +78,7 @@ public partial class MainWindow
 
     private void ShowDetails()
     {
+        UpdateActions();
         var node = SelectedNode ?? _nodes.SelectMany(n => n.Children.Prepend(n)).FirstOrDefault(n => n.IsSelected);
         if (node == null)
         {
@@ -190,6 +204,12 @@ public partial class MainWindow
         if (e.OriginalSource is DependencyObject source && Ancestor<TreeViewItem>(source)?.DataContext is ProfileNode { Profile: { } profile }
             && Ancestor<System.Windows.Controls.CheckBox>(source) == null)
             OpenEditor(profile);
+    }
+
+    private void ProfileCheck_Click(object sender, RoutedEventArgs e)
+    {
+        if (Ancestor<TreeViewItem>((DependencyObject)sender) is { } item)
+            item.IsSelected = true;
     }
 
     private void Tree_KeyDown(object sender, KeyEventArgs e)

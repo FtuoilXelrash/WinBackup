@@ -11,6 +11,7 @@ public class ProfileManager
     private bool _writable = true;
 
     public event Action? Changed;
+    public event Action<string, string>? FolderMoved;
 
     public IReadOnlyList<Profile> Profiles => _data.Profiles;
     public IReadOnlyList<string> Folders => _data.Folders;
@@ -77,6 +78,7 @@ public class ProfileManager
         EnsureFolder(newName);
         foreach (var profile in _data.Profiles.Where(p => p.Folder == oldName))
             profile.Folder = newName;
+        FolderMoved?.Invoke(oldName, newName);
         Commit();
     }
 
@@ -85,6 +87,7 @@ public class ProfileManager
         _data.Folders.Remove(name);
         foreach (var profile in _data.Profiles.Where(p => p.Folder == name))
             profile.Folder = "";
+        FolderMoved?.Invoke(name, "");
         Commit();
     }
 

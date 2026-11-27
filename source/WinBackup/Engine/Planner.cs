@@ -13,6 +13,7 @@ public static partial class Planner
         if (plan.Failures.Count > 0) return plan;
 
         var filter = new FilterSet(profile);
+        var timer = System.Diagnostics.Stopwatch.StartNew();
         switch (profile.Mode)
         {
             case CopyMode.Mirror:
@@ -28,6 +29,7 @@ public static partial class Planner
                 BuildBackup(plan, filter, control, status);
                 break;
         }
+        plan.Elapsed = timer.Elapsed;
         return plan;
     }
 
@@ -77,14 +79,17 @@ public static partial class Planner
         var source = Scanner.Scan(pair.SourceRoot, pair.SourceRoot, filter, control, status);
         if (Unreadable(pair, source)) return pair;
 
+        var removeSkipped = profile.Mode == CopyMode.Mirror && profile.RemoveSkippedFromDestination;
         var destination = Directory.Exists(pair.DestinationRoot)
-            ? Scanner.Scan(pair.DestinationRoot, pair.SourceRoot, filter, control, status)
+            ? Scanner.Scan(pair.DestinationRoot, pair.SourceRoot, filter, control, status, removeSkipped)
             : new ScanResult();
         if (Unreadable(pair, destination)) return pair;
 
         pair.Problems.AddRange(source.Problems);
         pair.Problems.AddRange(destination.Problems);
         pair.SourceFileCount = source.FileCount;
+        pair.SourceTotals = source.Totals;
+        pair.DestinationTotals = destination.Totals;
 
         foreach (var (relative, entry) in source.Entries)
         {
@@ -111,7 +116,13 @@ public static partial class Planner
                 if (!source.Entries.ContainsKey(relative) && !source.IsProtected(relative))
                     Add(pair, relative, null, entry, ItemAction.DeleteDestination, "Not in source");
 
-            Safeguard(profile, pair, source.FileCount, destination.FileCount, ItemAction.DeleteDestination);
+            foreach (var (relative, entry) in destination.Removable)
+                if (!source.IsProtected(relative))
+                    pair.Items.Add(new PlanItem(pair, relative, null, entry, ItemAction.DeleteDestination,
+                        "Skipped development file") { IsSkippedRemoval = true });
+
+            var destinationFiles = destination.FileCount + destination.Removable.Values.Count(e => !e.IsDirectory);
+            Safeguard(profile, pair, source.FileCount, destinationFiles, ItemAction.DeleteDestination);
         }
 
         Sort(pair);

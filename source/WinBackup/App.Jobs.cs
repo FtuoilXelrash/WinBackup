@@ -18,7 +18,15 @@ public partial class App
         ReportStore.Prune(Settings.Current.LogRetentionDays);
         Jobs.Completed += ReportStore.Save;
         Jobs.Completed += report => Dispatcher.BeginInvoke(() => JobFinished(report));
-        SessionEnding += (_, _) => StopJobs();
+        SessionEnding += (_, _) => EndSession();
+    }
+
+    private void EndSession()
+    {
+        if (IsExiting) return;
+        IsExiting = true;
+        Cleanup();
+        Settings.Save();
     }
 
     public bool Start(Profile profile, string trigger) =>

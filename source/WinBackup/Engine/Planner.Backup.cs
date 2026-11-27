@@ -52,6 +52,7 @@ public static partial class Planner
                 if (Unreadable(pair, scan)) continue;
                 pair.Problems.AddRange(scan.Problems);
                 pair.SourceFileCount = scan.FileCount;
+                pair.SourceTotals = scan.Totals;
 
                 foreach (var (relative, entry) in scan.Entries)
                     if (!entry.IsDirectory || profile.CreateEmptyFolders)

@@ -116,6 +116,20 @@
                         <CheckBox Content="Build output — bin and obj folders next to a project file" IsChecked="{Binding SkipBuildOutput}" Margin="0,2"/>
                         <CheckBox Content="Visual Studio working files — .vs folders, *.suo and project .user files" IsChecked="{Binding SkipVisualStudioFiles}" Margin="0,2"/>
                         <CheckBox Content="Git data — .git folders (the backup will not contain the repository history)" IsChecked="{Binding SkipGitData}" Margin="0,2"/>
+                        <Border Margin="0,8,0,2">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedValue, ElementName=ModeCombo}" Value="{x:Static m:CopyMode.Mirror}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <CheckBox Content="Remove skipped development files from the destination (Mirror mode only)"
+                                      IsChecked="{Binding RemoveSkippedFromDestination}"/>
+                        </Border>
                         <TextBlock TextWrapping="Wrap" Margin="0,8,0,0"
                                    Foreground="{DynamicResource AppSubtextBrush}"
                                    Text="One pattern per line. Use * and ? as wildcards. A pattern containing a backslash is compared with the path, otherwise with the name. An empty include box includes everything."/>

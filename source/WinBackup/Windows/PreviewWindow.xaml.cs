@@ -41,6 +41,7 @@ public partial class PreviewWindow : Window
         RunButton.IsEnabled = false;
         SummaryText.Text = "This profile no longer exists.";
         TotalsText.Visibility = Visibility.Collapsed;
+        UpToDateText.Visibility = Visibility.Collapsed;
         return false;
     }
 
@@ -55,6 +56,7 @@ public partial class PreviewWindow : Window
         RunButton.IsEnabled = RefreshButton.IsEnabled = false;
         SummaryText.Text = "";
         TotalsText.Visibility = Visibility.Collapsed;
+        UpToDateText.Visibility = Visibility.Collapsed;
 
         var throttle = Stopwatch.StartNew();
         try
@@ -104,7 +106,14 @@ public partial class PreviewWindow : Window
         RunButton.IsEnabled = plan.Failures.Count == 0 && items.Count > 0;
         UpdateSummary();
         ShowTotals(plan);
+        UpToDateText.Visibility = IsUpToDate(plan) ? Visibility.Visible : Visibility.Collapsed;
     }
+
+    private static bool IsUpToDate(JobPlan plan) =>
+        plan.Profile.Mode != CopyMode.Backup
+        && plan.Failures.Count == 0
+        && plan.Pairs.Count > 0
+        && plan.Pairs.All(p => p.Failure == null && p.Items.Count == 0 && p.Problems.All(x => !x.IsError));
 
     private void ShowTotals(JobPlan plan)
     {

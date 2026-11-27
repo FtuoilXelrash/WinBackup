@@ -103,6 +103,13 @@ public partial class MainWindow
                 StatusLabel.Text = $"{item.Name} is already running or waiting.";
     }
 
+    private void UpdateActions()
+    {
+        var node = SelectedNode;
+        PreviewButton.IsEnabled = PreviewMenuItem.IsEnabled = PreviewContextItem.IsEnabled = node?.Profile != null;
+        StartButton.IsEnabled = StartMenuItem.IsEnabled = StartContextItem.IsEnabled = node != null;
+    }
+
     private void RunSelected() => Queue(SelectedProfiles(), "Select a profile or a folder with enabled profiles.");
 
     private void Run_Click(object sender, RoutedEventArgs e) => RunSelected();

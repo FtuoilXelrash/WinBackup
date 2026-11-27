@@ -19,6 +19,7 @@ public static partial class Planner
             return pair;
         }
 
+        filter.ProjectRoots = new[] { pair.SourceRoot, pair.DestinationRoot };
         var source = Scanner.Scan(pair.SourceRoot, pair.SourceRoot, filter, control, status);
         if (Unreadable(pair, source)) return pair;
         var destination = Directory.Exists(pair.DestinationRoot)
@@ -29,6 +30,8 @@ public static partial class Planner
         pair.Problems.AddRange(source.Problems);
         pair.Problems.AddRange(destination.Problems);
         pair.SourceFileCount = source.FileCount;
+        pair.SourceTotals = source.Totals;
+        pair.DestinationTotals = destination.Totals;
 
         var candidates = new List<Candidate>();
         foreach (var relative in source.Entries.Keys.Union(destination.Entries.Keys, StringComparer.OrdinalIgnoreCase))

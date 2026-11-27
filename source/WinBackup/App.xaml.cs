@@ -64,7 +64,6 @@ public partial class App : Application
     partial void InitTray();
     partial void AfterStartup();
     partial void ConfirmBusyExit(ref bool allowed);
-    partial void MainWindowHidden();
     partial void SettingsChanged();
     partial void Cleanup();
 
@@ -115,7 +114,6 @@ public partial class App : Application
         if (Settings.Current.CloseToTray && HasTray)
         {
             window.Hide();
-            MainWindowHidden();
             return true;
         }
         if (ConfirmExit()) RequestExit();

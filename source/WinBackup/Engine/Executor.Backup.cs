@@ -216,8 +216,36 @@ public sealed partial class Executor
 
     partial void RunSpecial(JobPlan plan, List<PairPlan> pairs, ref bool handled)
     {
-        if (plan.Profile.Mode != CopyMode.Backup) return;
-        handled = true;
-        RunBackup(plan, pairs);
+        if (plan.Profile.Mode == CopyMode.Backup)
+        {
+            handled = true;
+            RunBackup(plan, pairs);
+        }
+        else if (plan.Profile.Mode == CopyMode.Sync)
+        {
+            handled = true;
+            foreach (var pair in pairs)
+                RunSync(pair);
+        }
+    }
+
+    private void RunSync(PairPlan pair)
+    {
+        if (!Attempt("Create folder", pair.DestinationRoot, () => Directory.CreateDirectory(pair.DestinationRoot))) return;
+        try
+        {
+            RunPair(pair);
+        }
+        finally
+        {
+            try
+            {
+                SyncState.Update(_profile, pair);
+            }
+            catch (Exception ex) when (IsExpected(ex))
+            {
+                _report.Add(EntryLevel.Error, "Sync history", pair.DestinationRoot, ex.Message);
+            }
+        }
     }
 }

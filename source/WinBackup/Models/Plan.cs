@@ -32,6 +32,7 @@ public sealed class PlanItem : INotifyPropertyChanged
     public string RelativePath { get; }
     public EntryInfo? Source { get; }
     public EntryInfo? Destination { get; }
+    public bool IsSkippedRemoval { get; init; }
     public ItemAction PlannedAction { get; }
     public string Reason { get; }
     public bool IsDirectory => (Source ?? Destination)!.IsDirectory;
@@ -72,7 +73,9 @@ public sealed class PlanItem : INotifyPropertyChanged
 
 public sealed record Problem(bool IsError, string Path, string Message);
 
-public sealed class PairPlan
+public sealed record ScanTotals(int Files, int Folders, long Bytes, int SkippedFiles, int SkippedFolders);
+
+public sealed partial class PairPlan
 {
     public string SourceRoot { get; init; } = "";
     public string DestinationRoot { get; init; } = "";
@@ -81,6 +84,8 @@ public sealed class PairPlan
     public string? Failure { get; set; }
     public string? BlockReason { get; set; }
     public int SourceFileCount { get; set; }
+    public ScanTotals? SourceTotals { get; set; }
+    public ScanTotals? DestinationTotals { get; set; }
 }
 
 public sealed class JobPlan
@@ -91,4 +96,5 @@ public sealed class JobPlan
     public List<PairPlan> Pairs { get; } = new();
     public List<string> Failures { get; } = new();
     public DateTime Created { get; } = DateTime.Now;
+    public TimeSpan Elapsed { get; set; }
 }

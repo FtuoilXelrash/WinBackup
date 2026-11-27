@@ -5,7 +5,9 @@ namespace WinBackup.Models;
 public enum CopyMode
 {
     Mirror,
-    Update
+    Update,
+    Backup,
+    Sync
 }
 
 public partial class Profile

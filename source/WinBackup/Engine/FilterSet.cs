@@ -12,10 +12,20 @@ public sealed class FilterSet
     private readonly List<Rule> _includeFolders;
     private readonly List<Rule> _excludeFolders;
 
+    private readonly bool _skipBuildOutput;
+    private readonly bool _skipVisualStudioFiles;
+    private readonly bool _skipGitData;
+    private readonly Dictionary<string, bool> _projectFolders = new(StringComparer.OrdinalIgnoreCase);
+
+    public IReadOnlyList<string> ProjectRoots { get; set; } = Array.Empty<string>();
+
     public bool HasFolderIncludes => _includeFolders.Count > 0;
 
     public FilterSet(Profile profile)
     {
+        _skipBuildOutput = profile.SkipBuildOutput;
+        _skipVisualStudioFiles = profile.SkipVisualStudioFiles;
+        _skipGitData = profile.SkipGitData;
         _includeFiles = Parse(profile.IncludeFiles);
         _excludeFiles = Parse(profile.ExcludeFiles);
         _includeFolders = Parse(profile.IncludeFolders);
@@ -43,7 +53,44 @@ public sealed class FilterSet
     }
 
     public bool ExcludesFolder(string relativePath, string sourceRoot) =>
+        IsDevelopmentFolder(relativePath, sourceRoot) || MatchesExcludedFolder(relativePath, sourceRoot);
+
+    public bool MatchesExcludedFolder(string relativePath, string sourceRoot) =>
         Matches(_excludeFolders, relativePath, sourceRoot);
+
+    public bool IsDevelopmentFolder(string relativePath, string sourceRoot)
+    {
+        var name = Path.GetFileName(relativePath);
+        bool Is(string other) => name.Equals(other, StringComparison.OrdinalIgnoreCase);
+
+        if (_skipVisualStudioFiles && Is(".vs")) return true;
+        if (_skipGitData && Is(".git")) return true;
+        if (!_skipBuildOutput || !(Is("bin") || Is("obj"))) return false;
+
+        var parent = Path.GetDirectoryName(relativePath) ?? "";
+        var roots = ProjectRoots.Count > 0 ? ProjectRoots : new[] { sourceRoot };
+        return roots.Any(root => HasProjectFile(Path.Combine(root, parent)));
+    }
+
+    private bool HasProjectFile(string folder)
+    {
+        if (_projectFolders.TryGetValue(folder, out var known)) return known;
+        var found = false;
+        try
+        {
+            found = Directory.Exists(folder) && Directory.EnumerateFiles(folder)
+                .Any(file => Path.GetExtension(file).EndsWith("proj", StringComparison.OrdinalIgnoreCase));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+            found = false;
+        }
+        return _projectFolders[folder] = found;
+    }
+
+    public bool IsDevelopmentFile(string relativePath) =>
+        _skipVisualStudioFiles && (relativePath.EndsWith(".suo", StringComparison.OrdinalIgnoreCase)
+                                   || relativePath.EndsWith("proj.user", StringComparison.OrdinalIgnoreCase));
 
     public bool IncludesFolder(string relativePath, string sourceRoot)
     {
@@ -53,7 +100,10 @@ public sealed class FilterSet
         return false;
     }
 
-    public bool IncludesFile(string relativePath, string sourceRoot)
+    public bool IncludesFile(string relativePath, string sourceRoot) =>
+        !IsDevelopmentFile(relativePath) && PassesPatterns(relativePath, sourceRoot);
+
+    public bool PassesPatterns(string relativePath, string sourceRoot)
     {
         if (HasFolderIncludes && !IncludesFolder(Path.GetDirectoryName(relativePath) ?? "", sourceRoot)) return false;
         if (_includeFiles.Count > 0 && !Matches(_includeFiles, relativePath, sourceRoot)) return false;
