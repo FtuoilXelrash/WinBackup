@@ -8,6 +8,12 @@
     <SolidColorBrush x:Key="AppBorderBrush" Color="#3F3F46"/>
     <SolidColorBrush x:Key="AppInputBrush" Color="#2D2D30"/>
 
+    <SolidColorBrush x:Key="ActionCopyToDestinationBrush" Color="#1F4A28"/>
+    <SolidColorBrush x:Key="ActionCopyToSourceBrush" Color="#1D3A5F"/>
+    <SolidColorBrush x:Key="ActionDeleteDestinationBrush" Color="#5A2327"/>
+    <SolidColorBrush x:Key="ActionDeleteSourceBrush" Color="#4E2452"/>
+    <SolidColorBrush x:Key="ActionSkipBrush" Color="#57470F"/>
+
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#3A4560"/>
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#E8E8E8"/>
     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#2A313D"/>
@@ -180,7 +186,8 @@
                         </ToggleButton>
                         <ContentPresenter IsHitTestVisible="False" Margin="6,2,22,2" VerticalAlignment="Center"
                                           Content="{TemplateBinding SelectionBoxItem}"
-                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
                         <Path IsHitTestVisible="False" HorizontalAlignment="Right" VerticalAlignment="Center"
                               Margin="0,0,7,0" Data="M 0 0 L 4 4 L 8 0 Z" Fill="#D4D4D4"/>
                         <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
@@ -199,6 +206,40 @@
                             <Setter Property="Opacity" Value="0.45"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type DatePickerTextBox}">
+        <Setter Property="Foreground" Value="#D4D4D4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DatePickerTextBox}">
+                    <Border Background="#2D2D30" Padding="3,1">
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type DatePicker}">
+        <Setter Property="Background" Value="#2D2D30"/>
+        <Setter Property="BorderBrush" Value="#555555"/>
+        <Setter Property="Foreground" Value="#D4D4D4"/>
+    </Style>
+
+    <Style TargetType="{x:Type GroupBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GroupBox}">
+                    <DockPanel>
+                        <ContentPresenter DockPanel.Dock="Top" ContentSource="Header" Margin="2,2,0,3"/>
+                        <Border BorderBrush="#3F3F46" BorderThickness="1" Padding="3">
+                            <ContentPresenter/>
+                        </Border>
+                    </DockPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
