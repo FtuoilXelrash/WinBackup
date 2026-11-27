@@ -1,0 +1,10 @@
+<Project>
+
+  <PropertyGroup>
+    <Product>WinBackup</Product>
+    <Authors>Ftuoil Xelrash</Authors>
+    <Company>Ftuoil Xelrash</Company>
+    <Version>0.0.11</Version>
+  </PropertyGroup>
+
+</Project>
