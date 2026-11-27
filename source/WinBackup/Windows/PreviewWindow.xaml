@@ -1,0 +1,103 @@
+<Window x:Class="WinBackup.Windows.PreviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="clr-namespace:WinBackup.Models"
+        Title="WinBackup — Preview" Width="1020" Height="620" MinWidth="640" MinHeight="360"
+        Icon="/WinBackup.ico" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppWindowBrush}"
+        TextElement.Foreground="{DynamicResource AppTextBrush}">
+    <DockPanel Margin="8">
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <TextBlock Text="Show:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <ComboBox x:Name="FilterCombo" Width="130" SelectedIndex="0" SelectionChanged="Filter_Changed">
+                <ComboBoxItem Content="All actions"/>
+                <ComboBoxItem Content="Copies"/>
+                <ComboBoxItem Content="Deletions"/>
+                <ComboBoxItem Content="Skipped"/>
+            </ComboBox>
+            <Button x:Name="RefreshButton" Content="Refresh" Padding="10,3" Margin="8,0,0,0" Click="Refresh_Click"/>
+            <TextBlock x:Name="SummaryText" VerticalAlignment="Center" Margin="14,0,0,0" TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button x:Name="RunButton" Content="Run" Width="90" IsEnabled="False" Click="Run_Click"/>
+                <Button Content="Close" Width="90" Margin="8,0,0,0" IsCancel="True" Click="Close_Click"/>
+            </StackPanel>
+            <WrapPanel VerticalAlignment="Center">
+                <Border Background="{DynamicResource ActionCopyToDestinationBrush}" Padding="8,2" Margin="0,0,6,0">
+                    <TextBlock Text="Copy →"/>
+                </Border>
+                <Border Background="{DynamicResource ActionCopyToSourceBrush}" Padding="8,2" Margin="0,0,6,0">
+                    <TextBlock Text="← Copy"/>
+                </Border>
+                <Border Background="{DynamicResource ActionDeleteDestinationBrush}" Padding="8,2" Margin="0,0,6,0">
+                    <TextBlock Text="Delete in destination"/>
+                </Border>
+                <Border Background="{DynamicResource ActionDeleteSourceBrush}" Padding="8,2" Margin="0,0,6,0">
+                    <TextBlock Text="Delete in source"/>
+                </Border>
+                <Border Background="{DynamicResource ActionSkipBrush}" Padding="8,2" Margin="0,0,12,0">
+                    <TextBlock Text="Skip"/>
+                </Border>
+                <TextBlock Text="Right-click selected rows to change their action." VerticalAlignment="Center"
+                           Foreground="{DynamicResource AppSubtextBrush}"/>
+            </WrapPanel>
+        </DockPanel>
+
+        <TextBox x:Name="WarningBox" DockPanel.Dock="Bottom" Margin="0,8,0,0" MaxHeight="110" IsReadOnly="True"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Visibility="Collapsed"/>
+
+        <Grid>
+            <DataGrid x:Name="ItemGrid" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                      SelectionMode="Extended" CanUserAddRows="False" GridLinesVisibility="Horizontal"
+                      EnableRowVirtualization="True" ContextMenuOpening="Menu_Opening"
+                      IsSynchronizedWithCurrentItem="False">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Action}" Value="{x:Static m:ItemAction.CopyToDestination}">
+                                <Setter Property="Background" Value="{DynamicResource ActionCopyToDestinationBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Action}" Value="{x:Static m:ItemAction.CopyToSource}">
+                                <Setter Property="Background" Value="{DynamicResource ActionCopyToSourceBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Action}" Value="{x:Static m:ItemAction.DeleteDestination}">
+                                <Setter Property="Background" Value="{DynamicResource ActionDeleteDestinationBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Action}" Value="{x:Static m:ItemAction.DeleteSource}">
+                                <Setter Property="Background" Value="{DynamicResource ActionDeleteSourceBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Action}" Value="{x:Static m:ItemAction.None}">
+                                <Setter Property="Background" Value="{DynamicResource ActionSkipBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Action" Binding="{Binding ActionText}" SortMemberPath="ActionText" Width="140"/>
+                    <DataGridTextColumn Header="Item" Binding="{Binding RelativePath}" Width="*"/>
+                    <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="160"/>
+                    <DataGridTextColumn Header="Source" Binding="{Binding SourceText}" Width="190"/>
+                    <DataGridTextColumn Header="Destination" Binding="{Binding DestinationText}" Width="190"/>
+                    <DataGridTextColumn Header="Destination folder" Binding="{Binding Pair.DestinationRoot}" Width="200"/>
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu x:Name="ActionMenu">
+                        <MenuItem Header="Skip" Tag="None" Click="SetAction_Click"/>
+                        <MenuItem Header="Copy to destination" Tag="CopyToDestination" Click="SetAction_Click"/>
+                        <MenuItem Header="Copy to source" Tag="CopyToSource" Click="SetAction_Click"/>
+                        <MenuItem Header="Delete in destination" Tag="DeleteDestination" Click="SetAction_Click"/>
+                        <MenuItem Header="Delete in source" Tag="DeleteSource" Click="SetAction_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+            <StackPanel x:Name="BusyPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Width="520">
+                <TextBlock Text="Comparing folders..." HorizontalAlignment="Center"/>
+                <ProgressBar IsIndeterminate="True" Height="10" Margin="0,8"/>
+                <TextBlock x:Name="BusyPath" FontSize="11" TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource AppSubtextBrush}"/>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
